@@ -38,6 +38,7 @@ gulp.task('js:watch', function() {
                 loaders: [
                     {
                         test: /\.js/
+                        , exclude: /(node_modules)/
                         , loader: 'babel'
                     }
                 ]
@@ -59,6 +60,7 @@ gulp.task('browser-sync', function() {
         server: {
             baseDir: './public'
         }
+        , open: false
     });
 
     gulp.watch(JS_OUTPUT_FILEPATH).on('change', browserSync.reload);
