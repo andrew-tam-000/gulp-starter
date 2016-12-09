@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
-var gulpWebpack = require('gulp-webpack');
+var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 var browserSync = require('browser-sync').create();
 var autoprefixer = require('gulp-autoprefixer');
@@ -33,7 +33,7 @@ gulp.task('scss', function() {
 
 gulp.task('js:watch', function() {
     return gulp.src(JS_INPUT)
-        .pipe(gulpWebpack({
+        .pipe(webpackStream({
             watch: true
             , module: {
                 loaders: [
@@ -48,7 +48,7 @@ gulp.task('js:watch', function() {
                 filename: JS_OUTPUT_FILENAME
             }
             , devtool: 'eval-source-map'
-        }, webpack))
+        }))
         .pipe(gulp.dest(JS_OUTPUT_DIR))
     ;
 });
@@ -92,7 +92,7 @@ gulp.task('scss:build', function() {
 
 gulp.task('js:build', function() {
     return gulp.src(JS_INPUT)
-        .pipe(gulpWebpack({
+        .pipe(webpackStream({
             plugins: [
                 new webpack.DefinePlugin({
                     "process.env": {
@@ -114,7 +114,7 @@ gulp.task('js:build', function() {
             , output: {
                 filename: JS_OUTPUT_FILENAME
             }
-        }, webpack))
+        }))
         .pipe(gulp.dest(JS_OUTPUT_DIR))
     ;
 });
