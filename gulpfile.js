@@ -17,6 +17,21 @@ var JS_OUTPUT_DIR = './public/lib/js';
 var JS_OUTPUT_FILENAME = 'bundle.js';
 var JS_OUTPUT_FILEPATH = path.join(JS_OUTPUT_DIR, JS_OUTPUT_FILENAME);
 
+var WEBPACK_BASE_OPTIONS = {
+    module: {
+        loaders: [
+            {
+                test: /\.js/
+                , exclude: /(node_modules)/
+                , loader: 'babel'
+            }
+        ]
+    }
+    , output: {
+        filename: JS_OUTPUT_FILENAME
+    }
+}
+
 
 gulp.task('scss:watch', function() {
     gulp.watch(SASS_INPUT, ['scss']);
@@ -33,22 +48,16 @@ gulp.task('scss', function() {
 
 gulp.task('js:watch', function() {
     return gulp.src(JS_INPUT)
-        .pipe(webpackStream({
-            watch: true
-            , module: {
-                loaders: [
-                    {
-                        test: /\.js/
-                        , exclude: /(node_modules)/
-                        , loader: 'babel'
-                    }
-                ]
-            }
-            , output: {
-                filename: JS_OUTPUT_FILENAME
-            }
-            , devtool: 'eval-source-map'
-        }))
+        .pipe(webpackStream(
+            Object.assign(
+                {}
+                , WEBPACK_BASE_OPTIONS
+                , {
+                    watch: true
+                    , devtool: 'eval-source-map'
+                }
+            )
+        ))
         .pipe(gulp.dest(JS_OUTPUT_DIR))
     ;
 });
@@ -92,32 +101,30 @@ gulp.task('scss:build', function() {
 
 gulp.task('js:build', function() {
     return gulp.src(JS_INPUT)
-        .pipe(webpackStream({
-            plugins: [
-                new webpack.DefinePlugin({
-                    "process.env": {
-                        // This has effect on the react lib size
-                        "NODE_ENV": JSON.stringify("production")
-                    }
-                })
-                , new webpack.optimize.UglifyJsPlugin()
-            ]
-            , module: {
-                loaders: [
-                    {
-                        test: /\.js/
-                        , exclude: /(node_modules)/
-                        , loader: 'babel'
-                    }
-                ]
-            }
-            , output: {
-                filename: JS_OUTPUT_FILENAME
-            }
-        }))
+        .pipe(webpackStream(
+            Object.assign(
+                {}
+                , WEBPACK_BASE_OPTIONS
+                , {
+                    plugins: [
+                        new webpack.DefinePlugin({
+                            "process.env": {
+                                // This has effect on the react lib size
+                                "NODE_ENV": JSON.stringify("production")
+                            }
+                        })
+                        , new webpack.optimize.UglifyJsPlugin()
+                    ]
+                }
+            )
+        ))
         .pipe(gulp.dest(JS_OUTPUT_DIR))
     ;
 });
-gulp.task('start', ['watch', 'browser-sync']);
 
+
+
+
+
+gulp.task('start', ['watch', 'browser-sync']);
 gulp.task('build', ['scss:build', 'js:build']);
