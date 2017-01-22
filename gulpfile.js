@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
-var webpackStream = require('webpack-stream');
+var webpackStream = require('webpack-stream-fixed');
 var webpack = require('webpack');
 var browserSync = require('browser-sync').create();
 var autoprefixer = require('gulp-autoprefixer');
@@ -15,7 +15,7 @@ var SASS_OUTPUT_FILEPATH = path.join(SASS_OUTPUT_DIR, 'main.css');
 var JS_INPUT = './src/js/main.js';
 var JS_OUTPUT_DIR = './public/lib/js';
 var JS_OUTPUT_FILENAME = 'bundle.js';
-var JS_OUTPUT_FILEPATH = path.join(JS_OUTPUT_DIR, JS_OUTPUT_FILENAME);
+var JS_OUTPUT_FILEPATH = path.join(__dirname, JS_OUTPUT_DIR, JS_OUTPUT_FILENAME);
 
 var WEBPACK_BASE_OPTIONS = {
     module: {
@@ -23,7 +23,7 @@ var WEBPACK_BASE_OPTIONS = {
             {
                 test: /\.js/
                 , exclude: /(node_modules)/
-                , loader: 'babel'
+                , loader: 'babel-loader'
             }
         ]
     }
@@ -48,16 +48,19 @@ gulp.task('scss', function() {
 
 gulp.task('js:watch', function() {
     return gulp.src(JS_INPUT)
-        .pipe(webpackStream(
-            Object.assign(
-                {}
-                , WEBPACK_BASE_OPTIONS
-                , {
-                    watch: true
-                    , devtool: 'eval-source-map'
-                }
+        .pipe(
+            webpackStream(
+                Object.assign(
+                    {}
+                    , WEBPACK_BASE_OPTIONS
+                    , {
+                        watch: true
+                        , devtool: 'eval-source-map'
+                    }
+                )
+                , webpack
             )
-        ))
+        )
         .pipe(gulp.dest(JS_OUTPUT_DIR))
     ;
 });
@@ -101,23 +104,26 @@ gulp.task('scss:build', function() {
 
 gulp.task('js:build', function() {
     return gulp.src(JS_INPUT)
-        .pipe(webpackStream(
-            Object.assign(
-                {}
-                , WEBPACK_BASE_OPTIONS
-                , {
-                    plugins: [
-                        new webpack.DefinePlugin({
-                            "process.env": {
-                                // This has effect on the react lib size
-                                "NODE_ENV": JSON.stringify("production")
-                            }
-                        })
-                        , new webpack.optimize.UglifyJsPlugin()
-                    ]
-                }
+        .pipe(
+            webpackStream(
+                Object.assign(
+                    {}
+                    , WEBPACK_BASE_OPTIONS
+                    , {
+                        plugins: [
+                            new webpack.DefinePlugin({
+                                "process.env": {
+                                    // This has effect on the react lib size
+                                    "NODE_ENV": JSON.stringify("production")
+                                }
+                            })
+                            , new webpack.optimize.UglifyJsPlugin()
+                        ]
+                    }
+                )
+                , webpack
             )
-        ))
+        )
         .pipe(gulp.dest(JS_OUTPUT_DIR))
     ;
 });

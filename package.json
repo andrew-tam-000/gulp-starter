@@ -25,8 +25,9 @@
     "gulp-sass": "^2.3.2",
     "gulp-sourcemaps": "^1.6.0",
     "node-sass": "^3.10.1",
-    "webpack": "^1.13.2",
-    "webpack-stream": "^3.2.0"
+    "webpack": "^2.2.0",
+    "webpack-stream": "^3.2.0",
+    "webpack-stream-fixed": "^3.2.2"
   },
   "dependencies": {
     "react": "^15.3.2",
